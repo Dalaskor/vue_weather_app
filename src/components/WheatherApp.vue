@@ -3,18 +3,20 @@
   <div class="container">
     <div class="app__content">
       <div class="app__search">
-        <input type="text" class="app__searchfield fieldsearch" v-model="cityName"
+        <input type="text" class="app__searchfield fieldsearch"
+               v-model="query"
+               @keypress="fetchWeather"
                placeholder="Search Location...">
       </div>
-      <div class="app__body body">
+      <div class="app__body body" v-if="typeof weather.main != 'undefined'">
         <h2 class="body__city">
-          {{ cityName }}
+          {{ weather.name || 'Select city' }}, {{ weather.sys.country}}
         </h2>
         <p class="body__today">
           {{ today }}
         </p>
         <p class="body__temperature">
-          {{ (temperature || '0') + '°C' }}
+          {{ (Math.round(weather.main.temp) || '0') + '°C' }}
         </p>
         <p class="body__separator">
           ----------
@@ -34,12 +36,42 @@
 export default {
   data() {
     return {
-      cityName: 'cityName',
-      today: 'Monday',
-      temperature: '16',
+      WeatherAPI: 'b2bfd67809b854f6308d532784e14bbb',
+      url_base: 'https://api.openweathermap.org/data/2.5/',
+      query: '',
+      weather: {},
+      today: this.getNameDay(),
       wheatherDescription: 'Broken Clouds',
       temperatureAll: '17/ 9',
     };
+  },
+  methods: {
+    fetchWeather(e) {
+      if (e.key === 'Enter') {
+        fetch(`${this.url_base}weather?q=${this.query}&units=metric&APPID=${this.WeatherAPI}`)
+        // eslint-disable-next-line
+          .then(res => {
+            return res.json();
+          }).then(this.setResults);
+      }
+    },
+    setResults(results) {
+      this.weather = results;
+    },
+    getNameDay() {
+      const days = [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ];
+      const date = new Date();
+      const number = date.getDay();
+      return `${days[number]}`;
+    },
   },
 };
 </script>
@@ -60,12 +92,14 @@ export default {
     background-image: url(./../static/bg_red.png);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
   }
   &__search {
     display: flex;
     justify-content: center;
     align-items: center;
+    justify-self: start;
+    margin-top: 25px;
   }
   &__searchfield {
   }
@@ -74,6 +108,7 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    transition: 0.4s;
   }
 }
 .body {
@@ -83,6 +118,7 @@ export default {
     // line-height: 59px;
     text-align: center;
     color: #000000;
+    margin-top: 85px;
   }
   &__today {
     font-size: 25px;
@@ -121,15 +157,21 @@ export default {
 .fieldsearch {
   width: 375px;
   height: 43px;
-  background: #FFFFFF;
-  box-shadow: 3px 4px 20px rgba(0, 0, 0, 0.25);
-  border-radius: 0px 10px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 0px 16px 0px 16px;
   font-family: 'Rubik';
   font-style: normal;
   font-weight: 400;
   font-size: 17px;
   // line-height: 20px;
-  color: #7E7E7E;
+  color: #313131;
   padding-left: 16px;
+  transition: 0.4s;
+}
+.fieldsearch:focus {
+  box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 16px 0px 16px 0px;
 }
 </style>
