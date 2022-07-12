@@ -15,5 +15,11 @@ export default {
 
 <style lang="scss">
 #app {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 20px;
+  color: #7E7E7E;
 }
 </style>
