@@ -1,5 +1,7 @@
 # vue_weather_app
 
+DEMO: https://dalaskor.github.io/vue_weather_app/
+
 ## Project setup
 ```
 npm install
