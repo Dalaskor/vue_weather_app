@@ -1,16 +1,17 @@
 <template>
 <!-- eslint-disable -->
   <div class="container">
-    <div class="app__content">
+    <div class="app__content" :class="{ app__content_blue: isCold }">
       <div class="app__search">
         <input type="text" class="app__searchfield fieldsearch"
                v-model="query"
                @keypress="fetchWeather"
                placeholder="Search Location...">
       </div>
+      <transition name="fade">
       <div class="app__body body" v-if="typeof weather.main != 'undefined'">
         <h2 class="body__city">
-          {{ weather.name || 'Select city' }}, {{ weather.sys.country}}
+          {{ weather.name || 'Select city' }}, {{ weather.sys.country }}
         </h2>
         <p class="body__today">
           {{ today }}
@@ -22,12 +23,13 @@
           ----------
         </p>
         <p class="body__description">
-          {{ wheatherDescription }}
+          {{ weather.weather[0].description }}
         </p>
         <p class="body__temperatureAll">
-          {{ (temperatureAll || '0/ 0') + '°C'  }}
+          {{ (Math.round(weather.main.temp_max) || '0') + '°C' }}/ {{ (Math.round(weather.main.temp_min) || '0') + '°C' }}
         </p>
       </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -41,9 +43,15 @@ export default {
       query: '',
       weather: {},
       today: this.getNameDay(),
-      wheatherDescription: 'Broken Clouds',
-      temperatureAll: '17/ 9',
+      isCold: false,
     };
+  },
+  watch: {
+    // eslint-disable-next-line
+    query: function(newValue) {
+      // eslint-disable-next-line
+      gsap.to(this.$data, { duration: 0.2, weather: newValue });
+    },
   },
   methods: {
     fetchWeather(e) {
@@ -57,6 +65,7 @@ export default {
     },
     setResults(results) {
       this.weather = results;
+      this.checkCold();
     },
     getNameDay() {
       const days = [
@@ -71,6 +80,13 @@ export default {
       const date = new Date();
       const number = date.getDay();
       return `${days[number]}`;
+    },
+    checkCold() {
+      if (Math.round(this.weather.main.temp) < 20) {
+        this.isCold = true;
+      } else {
+        this.isCold = false;
+      }
     },
   },
 };
@@ -93,6 +109,9 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: start;
+  }
+  &__content_blue {
+    background-image: url(./../static/bg_blue.png);
   }
   &__search {
     display: flex;
@@ -173,5 +192,14 @@ export default {
   box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.25);
   background-color: rgba(255, 255, 255, 0.75);
   border-radius: 16px 0px 16px 0px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
