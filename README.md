@@ -2,6 +2,8 @@
 
 DEMO: https://dalaskor.github.io/vue_weather_app/
 
+![Preview](https://github.com/Dalaskor/vue_weather_app/blob/master/src/assets/Preview.png?raw=true)
+
 ## Project setup
 ```
 npm install
